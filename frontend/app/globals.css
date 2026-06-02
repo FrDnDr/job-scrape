@@ -1,0 +1,104 @@
+/* ─── Google Fonts ──────────────────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* ─── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg: #070d14;
+  --bg-2: #0c1520;
+  --panel: #0f1923;
+  --panel-alt: #111e2b;
+  --overlay: rgba(7, 13, 20, 0.85);
+
+  /* Brand */
+  --teal: #0d9488;
+  --teal-light: #14b8a6;
+  --teal-dark: #0f766e;
+  --teal-glow: rgba(13, 148, 136, 0.2);
+
+  /* Accents */
+  --amber: #f59e0b;
+  --amber-dark: #d97706;
+  --red: #f43f5e;
+  --green: #22c55e;
+
+  /* Text */
+  --text: #e2e8f0;
+  --text-2: #94a3b8;
+  --text-3: #64748b;
+
+  /* Borders */
+  --line: rgba(255, 255, 255, 0.07);
+  --line-hover: rgba(255, 255, 255, 0.14);
+
+  /* Nav */
+  --nav: #060c13;
+  --nav-active: rgba(13, 148, 136, 0.15);
+
+  /* Spacing */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-teal: 0 0 24px rgba(13, 148, 136, 0.25);
+}
+
+/* ─── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font: inherit; }
+a { color: inherit; }
+
+/* ─── Animations ────────────────────────────────────────────────────────────── */
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shimmer  { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes spin     { to { transform: rotate(360deg); } }
+
+.spin { animation: spin 0.9s linear infinite; }
+
+/* ─── Demo-data banner ───────────────────────────────────────────────────────── */
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 24px 0;
+  padding: 10px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--amber);
+  font-size: 13px;
+  animation: fade-in 0.3s ease;
+}
+
+.banner-btn {
+  padding: 4px 12px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--amber);
+  background: transparent;
+  color: var(--amber);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.banner-btn:hover { background: rgba(245, 158, 11, 0.15); }
+.banner-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.banner-btn.secondary { border-color: var(--line-hover); color: var(--text-2); }
+.banner-btn.secondary:hover { background: rgba(255,255,255,0.05); }

@@ -1,0 +1,50 @@
+/* ─── Metrics bar ───────────────────────────────────────────────────────────── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.metric {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13,148,136,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.metric:hover { border-color: var(--line-hover); transform: translateY(-2px); }
+
+.metric-label { font-size: 12px; color: var(--text-3); font-weight: 500; }
+
+.metric-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 8px 0 4px;
+  color: var(--text);
+}
+
+.metric-trend { font-size: 12px; font-weight: 600; }
+.metric-trend.positive { color: var(--teal-light); }
+.metric-trend.negative { color: var(--red); }
+
+@media (max-width: 900px) {
+  .metrics { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+  .metrics { grid-template-columns: 1fr 1fr; }
+}

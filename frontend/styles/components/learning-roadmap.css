@@ -1,0 +1,92 @@
+/* ─── Learning Roadmap ──────────────────────────────────────────────────── */
+.roadmap-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  counter-reset: roadmap;
+}
+
+.roadmap-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.roadmap-item:hover { border-color: var(--line-hover); transform: translateX(2px); }
+
+.roadmap-step {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.roadmap-content { flex: 1; min-width: 0; }
+
+.roadmap-skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.roadmap-skill {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.roadmap-priority {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.roadmap-effort {
+  font-size: 11px;
+  color: var(--text-3);
+  display: block;
+}
+
+.roadmap-resources {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resource-link {
+  font-size: 11px;
+  color: var(--teal-light);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.resource-link:hover { text-decoration: underline; }
+
+.roadmap-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.6;
+}
