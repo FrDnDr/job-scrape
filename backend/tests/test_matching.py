@@ -7,13 +7,18 @@ from app.services.resume.parser import parse_resume_text
 
 class MatchingTests(unittest.TestCase):
     def test_parse_resume_text_extracts_profile(self) -> None:
+        resume_text = (
+            "Jane Candidate\n"
+            "Data engineer with 3 years experience using Python, SQL, and PostgreSQL."
+        )
         profile = parse_resume_text(
-            "Jane Candidate\nData engineer with 3 years experience using Python, SQL, and PostgreSQL."
+            resume_text
         )
 
         self.assertEqual(profile.candidate_name, "Jane Candidate")
         self.assertEqual(profile.years_experience, 3)
         self.assertTrue({"python", "sql", "postgresql"}.issubset(profile.skills))
+        self.assertEqual(profile.resume_text, resume_text)
 
     def test_score_resume_match_identifies_strengths_and_gaps(self) -> None:
         profile = ResumeProfile(

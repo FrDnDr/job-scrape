@@ -22,6 +22,7 @@ export interface JobSearchResponse {
 
 export interface ResumeProfile {
   candidate_name?: string | null;
+  resume_text: string;
   skills: string[];
   technologies: string[];
   years_experience?: number | null;

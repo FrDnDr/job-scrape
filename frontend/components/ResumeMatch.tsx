@@ -36,7 +36,7 @@ export default function ResumeMatch({ jobs, onProfileLoaded, onMatchResult }: Re
       setProfile(parsed);
       onProfileLoaded?.(parsed);
       if (selectedJob) {
-        const m = await matchResumeToJob(parsed.skills.join(", "), selectedJob);
+        const m = await matchResumeToJob(parsed.resume_text, selectedJob);
         handleMatchResult(m);
       }
     } catch (e) {

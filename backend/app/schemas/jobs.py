@@ -87,6 +87,7 @@ class ResumeParseRequest(BaseModel):
 
 class ResumeProfile(BaseModel):
     candidate_name: str | None = None
+    resume_text: str = ""
     skills: list[str]
     technologies: list[str]
     years_experience: float | None = None

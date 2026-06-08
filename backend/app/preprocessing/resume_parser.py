@@ -70,6 +70,7 @@ def parse_resume_text(text: str) -> dict:
     Returns:
         {
           "candidate_name":   str | None,
+          "resume_text":      str,
           "skills":           list[str],
           "technologies":     list[str],
           "years_experience": float | None,
@@ -81,6 +82,7 @@ def parse_resume_text(text: str) -> dict:
 
     return {
         "candidate_name": _extract_candidate_name(lines),
+        "resume_text": text,
         "skills": skills,
         "technologies": skills,
         "years_experience": _extract_years_experience(text),
