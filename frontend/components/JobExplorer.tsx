@@ -70,6 +70,7 @@ export default function JobExplorer({
       return (
         j.title.toLowerCase().includes(q) ||
         j.company.toLowerCase().includes(q) ||
+        j.description.toLowerCase().includes(q) ||
         j.skills.some((s) => s.toLowerCase().includes(q))
       );
     })

@@ -8,11 +8,11 @@ Strategy:
     The site uses a standard HTML listing format accessible without login.
 
 Endpoint:
-    https://www.onlinejobs.ph/jobseekers/jobsearch
+    https://www.onlinejobs.ph/jobseekers/jobsearch?jobkeyword=<query>
 
 Pagination:
-    Appends ?page=N to the URL. We stop when a page returns no jobs or
-    the limit is reached.
+    Requests /jobseekers/jobsearch/{page} for page 2+. We stop when a page
+    returns no jobs or the limit is reached.
 
 Rate limiting:
     1.5 seconds between page requests to avoid triggering bot detection.
@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import date, datetime
 from typing import Any
 
 from app.connectors.base_connector import BaseConnector
@@ -77,15 +78,14 @@ class OnlineJobsConnector(BaseConnector):
         remote_only = filters.get("remote_only", False)
         experience_level = str(filters.get("experience_level", "")).lower()
         employment_type = str(filters.get("employment_type", "")).lower()
+        params = self._build_search_params(query, employment_type)
 
         while len(jobs) < limit and page <= self.max_pages:
-            params: dict[str, Any] = {"q": query}
-            if page > 1:
-                params["page"] = page
+            url = self.base_url if page == 1 else f"{self.base_url}/{page}"
 
             try:
                 response = self._get_with_retry(
-                    self.base_url,
+                    url,
                     headers=self._HEADERS,
                     params=params,
                 )
@@ -121,9 +121,6 @@ class OnlineJobsConnector(BaseConnector):
                     ):
                         continue
 
-                if employment_type and employment_type not in desc_lower:
-                    continue
-
                 jobs.append(job)
 
             page += 1
@@ -132,6 +129,26 @@ class OnlineJobsConnector(BaseConnector):
 
         logger.info("[onlinejobs] Collected %d jobs for query '%s'", len(jobs), query)
         return jobs
+
+    def _build_search_params(self, query: str, employment_type: str = "") -> dict[str, Any]:
+        """Build OnlineJobs.ph search params for keyword and employment filters."""
+        params: dict[str, Any] = {
+            "jobkeyword": query,
+            "skill_tags": "",
+            "isFromJobsearchForm": "1",
+        }
+
+        employment_params = {
+            "full-time": ("fullTime",),
+            "part-time": ("partTime",),
+            "contract": ("gig",),
+            "freelance": ("gig",),
+        }.get(employment_type, ("gig", "partTime", "fullTime"))
+
+        for param in employment_params:
+            params[param] = "on"
+
+        return params
 
     def _parse_page(self, html: str, query: str) -> list[RawJobPosting]:
         """Parse a single results page and return RawJobPosting records."""
@@ -193,6 +210,7 @@ class OnlineJobsConnector(BaseConnector):
                 title_el = (
                     card.select_one("h2 a")
                     or card.select_one("h3 a")
+                    or card.select_one("h4 a")
                     or card.select_one("a.job-title")
                     or card.select_one("[class*='title'] a")
                     or card.select_one("a")
@@ -220,12 +238,16 @@ class OnlineJobsConnector(BaseConnector):
                 # Description
                 desc_el = (
                     card.select_one("[class*='desc']")
-                    or card.select_one("[class*='detail']")
                     or card.select_one("p")
                 )
-                description = clean_description(
-                    desc_el.get_text(separator=" ", strip=True) if desc_el else title
-                )
+                desc_text = desc_el.get_text(separator=" ", strip=True) if desc_el else title
+
+                meta_texts = [
+                    el.get_text(" ", strip=True)
+                    for el in card.select("[class*='job-meta'], [class*='job-type'], [class*='type']")
+                    if el.get_text(" ", strip=True)
+                ]
+                description = clean_description(" ".join([desc_text, *meta_texts]))
 
                 # Salary
                 salary_el = card.select_one("[class*='salary']") or card.select_one("[class*='pay']")
@@ -236,8 +258,12 @@ class OnlineJobsConnector(BaseConnector):
                 location = location_el.get_text(strip=True) if location_el else "Philippines"
 
                 # Skills from tag pills
-                skill_els = card.select("[class*='tag']") or card.select("[class*='skill']")
+                skill_els = card.select("[class*='skill']") or card.select("[class*='tag']")
                 skills = [el.get_text(strip=True) for el in skill_els if el.get_text(strip=True)]
+                if skills:
+                    skills = list(dict.fromkeys(skills))
+
+                posted_at = self._extract_posted_at(card.get_text(" ", strip=True))
 
                 jobs.append(
                     RawJobPosting(
@@ -249,6 +275,7 @@ class OnlineJobsConnector(BaseConnector):
                         skills=skills,
                         salary=salary,
                         location=location,
+                        posted_at=posted_at,
                         description=description or title,
                     )
                 )
@@ -257,3 +284,20 @@ class OnlineJobsConnector(BaseConnector):
                 continue
 
         return jobs
+
+    def _extract_posted_at(self, text: str) -> date | None:
+        """Extract common OnlineJobs.ph posted-date text when present."""
+        match = re.search(
+            r"(?:posted\s+(?:on\s+)?)?([A-Z][a-z]{2,8}\s+\d{1,2},\s+\d{4})",
+            text,
+            re.I,
+        )
+        if not match:
+            return None
+
+        for fmt in ("%b %d, %Y", "%B %d, %Y"):
+            try:
+                return datetime.strptime(match.group(1), fmt).date()
+            except ValueError:
+                continue
+        return None
